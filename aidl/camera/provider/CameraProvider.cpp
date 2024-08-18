@@ -153,22 +153,22 @@ std::string CameraProvider::getAidlDeviceName(std::string cameraId) {
 
 CameraProvider::CameraProvider()
     : camera_module_callbacks_t({sCameraDeviceStatusChange, sTorchModeStatusChange}) {
-    mInitFailed = initialize();
+    mInitFailed = !initialize();
 }
 
 CameraProvider::~CameraProvider() {}
 
-bool CameraProvider::initCamera(int id) {
+bool CameraProvider::initOneCamera(int id) {
     struct camera_info info;
     auto rc = mModule->getCameraInfo(id, &info);
     if (rc != NO_ERROR) {
         ALOGE("%s: Camera info query failed!", __func__);
-        return true;
+        return false;
     }
 
     if (checkCameraVersion(id, info) != OK) {
         ALOGE("%s: Camera version check failed!", __func__);
-        return true;
+        return false;
     }
 
     char cameraId[kMaxCameraIdLen];
@@ -178,7 +178,7 @@ bool CameraProvider::initCamera(int id) {
 
     addDeviceNames(id);
 
-    return false;
+    return true;
 }
 
 bool CameraProvider::initialize() {
@@ -188,7 +188,7 @@ bool CameraProvider::initialize() {
         err = hw_get_module(CAMERA_HARDWARE_MODULE_ID, (const hw_module_t**)&rawModule);
         if (err < 0) {
             ALOGE("Could not load camera HAL module: %d (%s)", err, strerror(-err));
-            return true;
+            return false;
         }
     }
 
@@ -197,7 +197,7 @@ bool CameraProvider::initialize() {
     if (err != OK) {
         ALOGE("Could not initialize camera HAL module: %d (%s)", err, strerror(-err));
         mModule.clear();
-        return true;
+        return false;
     }
     ALOGI("Loaded \"%s\" camera module", mModule->getModuleName());
 
@@ -212,14 +212,14 @@ bool CameraProvider::initialize() {
     if (err != OK) {
         ALOGE("Could not set camera module callback: %d (%s)", err, strerror(-err));
         mModule.clear();
-        return true;
+        return false;
     }
 
     mNumberOfLegacyCameras = mModule->getNumberOfCameras();
     for (int i = 0; i < mNumberOfLegacyCameras; i++) {
-        if (initCamera(i)) {
+        if (!initOneCamera(i)) {
             mModule.clear();
-            return true;
+            return false;
         }
     }
     std::vector<int> extraIDs = {
@@ -228,15 +228,15 @@ bool CameraProvider::initialize() {
 #endif
     };
     for (int i : extraIDs) {
-        if (initCamera(i)) {
+        if (!initOneCamera(i)) {
             mModule.clear();
-            return true;
+            return false;
         } else {
             mNumberOfLegacyCameras++;
         }
     }
 
-    return false;  // mInitFailed
+    return true;
 }
 
 /**
