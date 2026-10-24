@@ -9,7 +9,7 @@ cc_binary {
     init_rc: ["android.hardware.vibrator-service.samsung.rc"],
     vintf_fragments: ["android.hardware.vibrator-service.samsung.xml"],
     cppflags: select(soong_config_variable("samsungVibratorVars", "duration_amplitude"), {
-        true: ["-DVIBRATOR_SUPPORTS_DURATION_AMPLITUDE_CONTROL"],
+        "true": ["-DVIBRATOR_SUPPORTS_DURATION_AMPLITUDE_CONTROL"],
         default: [],
     }),
     srcs: [

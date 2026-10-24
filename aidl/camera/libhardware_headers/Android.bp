@@ -6,19 +6,19 @@
 cc_defaults {
     name: "samsung_camera3_defaults",
     cppflags: select(soong_config_variable("samsungCameraVars", "needs_fps_field"), {
-        true: ["-DCAMERA_NEEDS_FPS_FIELD"],
+        "true": ["-DCAMERA_NEEDS_FPS_FIELD"],
         default: [],
     }) + select(soong_config_variable("samsungCameraVars", "needs_sec_get_cam_pos_v1"), {
-        true: ["-DCAMERA_NEEDS_SEC_GET_CAM_POS_V1"],
+        "true": ["-DCAMERA_NEEDS_SEC_GET_CAM_POS_V1"],
         default: [],
     }) + select(soong_config_variable("samsungCameraVars", "needs_sec_get_cam_pos_v2"), {
-        true: ["-DCAMERA_NEEDS_SEC_GET_CAM_POS_V2"],
+        "true": ["-DCAMERA_NEEDS_SEC_GET_CAM_POS_V2"],
         default: [],
     }) + select(soong_config_variable("samsungCameraVars", "needs_sec_reserved_field"), {
-        true: ["-DCAMERA_NEEDS_SEC_RESERVED_FIELD"],
+        "true": ["-DCAMERA_NEEDS_SEC_RESERVED_FIELD"],
         default: [],
     }) + select(soong_config_variable("samsungCameraVars", "usage_64bit"), {
-        true: ["-DCAMERA_64BIT_USAGE"],
+        "true": ["-DCAMERA_64BIT_USAGE"],
         default: [],
     }),
 }
